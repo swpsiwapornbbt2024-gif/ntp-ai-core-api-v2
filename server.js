@@ -6,9 +6,19 @@ const cors = require('cors');
 // ใช้ Connection String ที่คุณกู้คืนมาแทนที่ใน URI นี้
 const uri = process.env.MONGO_URI;
 const client = new MongoClient(uri);
-const app = express();
+const app = express() 
+// ... โค้ดส่วนบน (Require, URI, Client, App) ...
+
 // Server ที่ Deploy บน Render จะใช้ PORT ที่ระบบกำหนด
 const port = process.env.PORT || 3000; 
+// *********** NEW: กำหนด Host เป็น 0.0.0.0 ***********
+const host = '0.0.0.0';
+
+// ... API Endpoints ... 
+
+app.listen(port, host, () => { // เพิ่ม host เข้าไป
+    console.log(`Server listening on ${host}:${port}`);
+});
 
 app.use(cors());
 app.use(express.json());
