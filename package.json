@@ -4,7 +4,7 @@
   "description": "The new core API for NTP Social Enterprise Logistics.",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+  "start": "npm install && node server.js"
   },
   "dependencies": {
     "express": "^4.19.2",
