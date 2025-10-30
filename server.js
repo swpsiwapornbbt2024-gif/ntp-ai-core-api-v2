@@ -4,9 +4,8 @@ const cors = require('cors');
 
 // ********** IMPORTANT: CONNECTION STRING **********
 // ใช้ Connection String ที่คุณกู้คืนมาแทนที่ใน URI นี้
-const uri = "mongodb+srv://logisticsUser:swpbbt1234@jaswp.mongodb.net/?retryWrites=true&w=majority";
+const uri = process.env.MONGO_URI;
 const client = new MongoClient(uri);
-
 const app = express();
 // Server ที่ Deploy บน Render จะใช้ PORT ที่ระบบกำหนด
 const port = process.env.PORT || 3000; 
