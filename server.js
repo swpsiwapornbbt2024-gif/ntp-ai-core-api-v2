@@ -53,29 +53,23 @@ app.get('/api/social_impact_data', async (req, res) => {
     } finally {
         // ในการ Deploy จริง จะจัดการ Connection pool
     }
-});
+})
 
-// **********************************************
-// 4. START SERVER (เรียกใช้เพียงครั้งเดียวตอนท้ายสุด)
-// **********************************************
-app.listen(port, host, () => { 
-    console.log(`Server listening on ${host}:${port}`);
-});
+// ในไฟล์ server.js (ตัวอย่างโค้ดที่เพิ่ม)
 
-// ในไฟล์ server.js (สมมติว่าคุณได้เรียกใช้ Express และ MongoDB แล้ว)
+// ... (โค้ดเชื่อมต่อ MongoDB, app.use(express.json()) และอื่นๆ) ...
 
-// ... (โค้ด Express app.use() และอื่นๆ) ...
-
-// **เพิ่มโค้ด Route นี้ตรงนี้:**
+// **เพิ่ม Route สำหรับ GET /api/v1/users ตรงนี้**
 app.get('/api/v1/users', async (req, res) => {
     try {
-        // โค้ด MongoDB สำหรับค้นหาข้อมูล (ต้องแน่ใจว่าได้เรียกใช้โมเดล User หรือ MongoDB Connection แล้ว)
-        // const users = await User.find({}); 
-        res.status(200).json({ message: "Route is working, but MongoDB code is missing." }); // สามารถทดสอบด้วยโค้ดนี้ก่อน
+        // หากต้องการทดสอบว่า Route ทำงาน ให้ใช้โค้ดนี้ก่อน:
+        res.status(200).json({ message: "Route is active!", users: [] }); 
+        
+        // เมื่อพร้อมแล้วให้ใส่โค้ด MongoDB ที่ถูกต้อง (เช่น const users = await User.find({});)
     } catch (error) {
         console.error("MongoDB Error:", error);
-        res.status(500).send("Internal Server Error during MongoDB operation.");
+        res.status(500).send("Internal Server Error: Could not fetch data.");
     }
 });
 
-// ... (โค้ด app.listen(port, ...) ต้องอยู่สุดท้าย) ... 
+// ... (โค้ด app.listen(port, ...) ต้องอยู่สุดท้ายเสมอ) ... 
