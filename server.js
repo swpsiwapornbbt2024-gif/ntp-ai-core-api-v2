@@ -56,6 +56,19 @@ app.get('/api/social_impact_data', async (req, res) => {
 });
 
 // ในไฟล์ server.js (ตัวอย่างโค้ดที่เพิ่ม)
+// ในไฟล์ server.js (เพิ่มโค้ดนี้ก่อน app.listen)
+
+app.get('/api/v1/users', async (req, res) => {
+    try {
+        // ใช้โค้ดนี้เพื่อยืนยันว่า Route ทำงานก่อน:
+        res.status(200).json({ status: "success", message: "User route is working!", users: [] }); 
+        
+        // (เมื่อต้องการดึงข้อมูลจริง ให้แทนที่ด้วยโค้ด MongoDB ของคุณ)
+    } catch (error) {
+        console.error("MongoDB Error:", error);
+        res.status(500).send("Internal Server Error: Could not fetch data.");
+    }
+});
 
 // ... (โค้ดเชื่อมต่อ MongoDB, app.use(express.json()) และอื่นๆ) ...
 
