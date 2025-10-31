@@ -53,7 +53,7 @@ app.get('/api/social_impact_data', async (req, res) => {
     } finally {
         // ในการ Deploy จริง จะจัดการ Connection pool
     }
-})
+});
 
 // ในไฟล์ server.js (ตัวอย่างโค้ดที่เพิ่ม)
 
