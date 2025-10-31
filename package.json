@@ -1,15 +1,11 @@
 {
   "name": "ntp-ai-core-api-v2",
-  "version": "1.0.0",
-  "description": "The new core API for NTP Social Enterprise Logistics.",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js" 
-  },
+  // ... (ส่วนอื่นๆ) ...
   "dependencies": {
     "express": "^4.19.2",
     "mongodb": "^6.8.0",
     "cors": "^2.8.5"
   }
 }
+
 
