@@ -1,102 +1,75 @@
+// server.js
+
 const express = require('express');
 const { MongoClient } = require('mongodb');
 const cors = require('cors');
 
-// **********************************************
-// 1. CONFIGURATION & INITIALIZATION
-// **********************************************
-// ใช้ URI จาก Environment Variable
-const uri = process.env.MONGO_URI; 
-const client = new MongoClient(uri);
 const app = express();
 
-// กำหนด PORT และ HOST ตามที่ Render กำหนด
-const port = process.env.PORT || 3000; 
-const host = '0.0.0.0'; 
-
-// **********************************************
-// 2. MIDDLEWARE (ต้องอยู่ก่อน API Endpoints)
-// **********************************************
+// **การตั้งค่า Middleware**
 app.use(cors());
-app.use(express.json());
+app.use(express.json()); // สำหรับการอ่าน JSON ใน POST requests
 
-// **********************************************
-// 3. API ENDPOINTS
-// **********************************************
+// **การเชื่อมต่อ MongoDB**
+const MONGO_URI = process.env.MONGO_URI;
+if (!MONGO_URI) {
+    console.error("❌ ERROR: MONGO_URI environment variable is not set.");
+    process.exit(1);
+}
 
-// API Endpoint: Health Check
-app.get('/', (req, res) => {
-    res.send('NTP AI Core API V2 is Online and ready to serve!');
-});
+let db;
 
-// API Endpoint หลัก: ดึงข้อมูลเชื่อมโยงเพื่อสร้างรายได้
-app.get('/api/social_impact_data', async (req, res) => {
+async function connectDB() {
     try {
+        const client = new MongoClient(MONGO_URI);
         await client.connect();
-        
-        const logisticsDB = client.db('logistics'); 
-        const ntpLogisticsDB = client.db('ntp_logistics'); 
-
-        // ดึงข้อมูล
-        const latestJobs = await logisticsDB.collection('jobs').find({}).sort({ date: -1 }).limit(5).toArray();
-        const maintenanceAlerts = await ntpLogisticsDB.collection('maintenance').find({ status: 'pending' }).limit(5).toArray();
-        
-        res.status(200).json({
-            status: "success",
-            message: "Core data synchronized and ready for AI analysis.",
-            latest_jobs: latestJobs,
-            maintenance_alerts: maintenanceAlerts 
-        });
+        db = client.db(); // ถ้าคุณต้องการเชื่อมต่อกับ database ชื่อเฉพาะ ให้ใส่ชื่อ database ใน .db('your_db_name')
+        console.log("✅ MongoDB successfully connected.");
     } catch (error) {
-        console.error("Connection or Data Retrieval Error:", error);
-        res.status(500).json({ status: "error", message: "Internal server error. Failed to connect or retrieve data." });
-    } finally {
-        // ในการ Deploy จริง จะจัดการ Connection pool
+        console.error("❌ MongoDB connection failed:", error.message);
+        // ทำให้แอปฯ ล้มเหลวถ้าเชื่อมต่อ DB ไม่ได้
+        process.exit(1); 
     }
+}
+
+// **Route พื้นฐาน (ที่ทำงานอยู่แล้ว)**
+app.get('/', (req, res) => {
+    res.status(200).send("NTP AI Core API V2 is Online and ready to serve");
 });
 
-// ในไฟล์ server.js (ตัวอย่างโค้ดที่เพิ่ม)
-// ในไฟล์ server.js (เพิ่มโค้ดนี้ก่อน app.listen)
+// --------------------------------------------------------------------------------
+// **Route ที่แก้ไข (แก้ปัญหา 404 Not Found)**
+// --------------------------------------------------------------------------------
 
 app.get('/api/v1/users', async (req, res) => {
+    // โค้ดนี้จะยืนยันว่า Route ทำงานได้ก่อน
+    // เมื่อคุณพร้อมที่จะดึงข้อมูลจริง ให้ใช้ db.collection('your_collection_name').find().toArray();
     try {
-        // ใช้โค้ดนี้เพื่อยืนยันว่า Route ทำงานก่อน:
-        res.status(200).json({ status: "success", message: "User route is working!", users: [] }); 
-        
-        // (เมื่อต้องการดึงข้อมูลจริง ให้แทนที่ด้วยโค้ด MongoDB ของคุณ)
+        // ตัวอย่างการดึงข้อมูลจาก collection ชื่อ 'users' (ถ้าคุณสร้างไว้)
+        // const usersCollection = db.collection('users');
+        // const users = await usersCollection.find({}).toArray();
+
+        // ส่ง Response 200 OK เพื่อยืนยันว่า Route ทำงานได้สำเร็จ
+        res.status(200).json({ 
+            status: "success", 
+            message: "User route is working! (Database connection confirmed by successful server start)", 
+            users: [] // ส่ง Array ว่างไปก่อน
+        }); 
+
     } catch (error) {
-        console.error("MongoDB Error:", error);
-        res.status(500).send("Internal Server Error: Could not fetch data.");
+        console.error("❌ Error fetching users:", error);
+        res.status(500).json({ status: "error", message: "Internal Server Error during data retrieval." });
     }
 });
 
-// ... (โค้ดเชื่อมต่อ MongoDB, app.use(express.json()) และอื่นๆ) ...
 
-// **เพิ่ม Route สำหรับ GET /api/v1/users ตรงนี้**
-app.get('/api/v1/users', async (req, res) => {
-    try {
-        // หากต้องการทดสอบว่า Route ทำงาน ให้ใช้โค้ดนี้ก่อน:
-        res.status(200).json({ message: "Route is active!", users: [] }); 
-        
-        // เมื่อพร้อมแล้วให้ใส่โค้ด MongoDB ที่ถูกต้อง (เช่น const users = await User.find({});)
-    } catch (error) {
-        console.error("MongoDB Error:", error);
-        res.status(500).send("Internal Server Error: Could not fetch data.");
-    }
+// **คำสั่งเริ่มเซิร์ฟเวอร์ (สำคัญมาก)**
+// ต้องเรียก connectDB ก่อนที่จะเรียก app.listen
+connectDB().then(() => {
+    const port = process.env.PORT || 3000; 
+
+    app.listen(port, '0.0.0.0', () => {
+        console.log(`✅ Server listening on 0.0.0.0:${port}`);
+    });
 });
 
-// ... (โค้ด app.listen(port, ...) ต้องอยู่สุดท้ายเสมอ) ... 
-
-// ในไฟล์ server.js (เพิ่มโค้ดนี้ก่อน app.listen)
-
-app.get('/api/v1/users', async (req, res) => {
-    try {
-        // หากต้องการทดสอบว่า Route ทำงาน ให้ใช้โค้ดนี้ก่อน:
-        res.status(200).json({ status: "success", message: "User route is working!", users: [] }); 
-        
-        // เมื่อพร้อมแล้วให้ใส่โค้ด MongoDB ที่ถูกต้อง (เช่น const users = await User.find({});)
-    } catch (error) {
-        console.error("MongoDB Error:", error);
-        res.status(500).send("Internal Server Error: Could not fetch data.");
-    }
-});
