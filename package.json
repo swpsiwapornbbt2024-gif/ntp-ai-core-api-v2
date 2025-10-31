@@ -1,6 +1,6 @@
 {
   "name": "ntp-ai-core-api-v2",
-  // ... (ส่วนอื่นๆ) ...
+
   "dependencies": {
     "express": "^4.19.2",
     "mongodb": "^6.8.0",
