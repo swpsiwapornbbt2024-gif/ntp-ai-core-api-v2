@@ -13,3 +13,14 @@
   }
 }
 
+// ตรวจสอบใน server.js หรือ userRoutes.js
+
+app.get('/api/v1/users', async (req, res) => {
+    try {
+        // ... โค้ด MongoDB สำหรับค้นหาข้อมูล ...
+        const users = await User.find({});
+        res.status(200).json(users);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+});
