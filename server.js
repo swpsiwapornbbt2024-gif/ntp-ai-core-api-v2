@@ -73,3 +73,17 @@ app.get('/api/v1/users', async (req, res) => {
 });
 
 // ... (โค้ด app.listen(port, ...) ต้องอยู่สุดท้ายเสมอ) ... 
+
+// ในไฟล์ server.js (เพิ่มโค้ดนี้ก่อน app.listen)
+
+app.get('/api/v1/users', async (req, res) => {
+    try {
+        // หากต้องการทดสอบว่า Route ทำงาน ให้ใช้โค้ดนี้ก่อน:
+        res.status(200).json({ status: "success", message: "User route is working!", users: [] }); 
+        
+        // เมื่อพร้อมแล้วให้ใส่โค้ด MongoDB ที่ถูกต้อง (เช่น const users = await User.find({});)
+    } catch (error) {
+        console.error("MongoDB Error:", error);
+        res.status(500).send("Internal Server Error: Could not fetch data.");
+    }
+});
